@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آسفة... يا سيدرا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --peach: #FBE3D8;
+    --blush: #F6C6C7;
+    --paper: #FFFBF5;
+    --plum: #4A2C3D;
+    --rose: #C15B69;
+    --rose-deep: #9C3F4E;
+    --gold: #D9A441;
+    --sage: #9CB897;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(160deg, var(--peach) 0%, var(--blush) 55%, #F3D4D9 100%);
+    color: var(--plum);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Floating petals background */
+  .petal-field{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .petal{
+    position: absolute;
+    top: -5%;
+    opacity: 0.55;
+    animation: fall linear infinite;
+  }
+  .petal svg{ width: 100%; height: 100%; display:block; }
+
+  @keyframes fall{
+    0%   { transform: translateY(-10vh) translateX(0) rotate(0deg); }
+    50%  { transform: translateY(50vh) translateX(20px) rotate(180deg); }
+    100% { transform: translateY(110vh) translateX(-15px) rotate(360deg); }
+  }
+
+  /* ---------- Hero / Envelope / Letter stage ---------- */
+  .hero{
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 1.2rem 5rem;
+  }
+
+  .hero-eyebrow{
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    color: var(--rose-deep);
+    margin-bottom: 0.6rem;
+    opacity: 0.85;
+    transition: opacity 0.4s ease;
+  }
+
+  .hero h1{
+    font-family: 'Aref Ruqaa', serif;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    color: var(--plum);
+    margin-bottom: 0.4rem;
+    transition: opacity 0.4s ease;
+  }
+
+  .hero p.sub{
+    font-size: 1.05rem;
+    color: var(--rose-deep);
+    margin-bottom: 3rem;
+    max-width: 380px;
+    transition: opacity 0.4s ease;
+  }
+
+  .hero.opened .hero-eyebrow,
+  .hero.opened h1,
+  .hero.opened p.sub{
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  /* Stage holds the envelope and the letter, same spot */
+  .stage{
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .envelope-wrap{
+    perspective: 1400px;
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .envelope-wrap.hide{
+    opacity: 0;
+    transform: scale(0.82);
+    pointer-events: none;
+  }
+  .envelope-wrap.gone{
+    display: none;
+  }
+
+  .envelope{
+    position: relative;
+    width: min(320px, 78vw);
+    height: 210px;
+    filter: drop-shadow(0 18px 30px rgba(156,63,78,0.25));
+    transition: transform 0.4s ease;
+  }
+  .envelope-wrap:hover .envelope{ transform: translateY(-4px); }
+
+  .env-body{
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+    border-radius: 6px;
+    border: 1.5px solid #EBD2C8;
+  }
+
+  .env-body::before, .env-body::after{
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-top: 105px solid #FDEDE3;
+  }
+  .env-body::before{
+    right: 0;
+    border-right: 160px solid transparent;
+  }
+  .env-body::after{
+    left: 0;
+    border-left: 160px solid transparent;
+  }
+
+  .env-flap{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 105px;
+    background: linear-gradient(160deg, #F3D9CE, #EAC3B4);
+    clip-path: polygon(0 0, 100% 0, 50% 78%);
+    transform-origin: top;
+    transition: transform 0.9s cubic-bezier(.6,-0.2,.3,1.3);
+    z-index: 5;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .seal{
+    position: absolute;
+    top: 55px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--rose), var(--rose-deep));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Aref Ruqaa', serif;
+    color: #FFEFE6;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    z-index: 6;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+  }
+
+  .letter-peek{
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    width: 84%;
+    height: 70%;
+    background: var(--paper);
+    border-radius: 4px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.9s ease 0.15s;
+    z-index: 3;
+  }
+
+  .envelope.open .env-flap{
+    transform: rotateX(180deg);
+  }
+  .envelope.open .seal{
+    opacity: 0;
+    transform: translateX(-50%) scale(0.4);
+  }
+  .envelope.open .letter-peek{
+    transform: translateX(-50%) translateY(-235px);
+  }
+
+  .hint{
+    margin-top: 2.2rem;
+    font-size: 0.9rem;
+    color: var(--rose-deep);
+    animation: pulse-soft 2.2s ease-in-out infinite;
+    transition: opacity 0.3s ease;
+  }
+
+  @keyframes pulse-soft{
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+  }
+
+  .scroll-cue{
+    margin-top: 3rem;
+    width: 22px;
+    height: 34px;
+    border: 2px solid var(--rose-deep);
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    position: relative;
+    cursor: pointer;
+  }
+  .scroll-cue.show{ opacity: 0.6; }
+  .scroll-cue::before{
+    content:"";
+    position:absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 8px;
+    background: var(--rose-deep);
+    border-radius: 2px;
+    animation: scroll-dot 1.6s ease-in-out infinite;
+  }
+  @keyframes scroll-dot{
+    0% { transform: translate(-50%, 0); opacity: 1; }
+    100% { transform: translate(-50%, 12px); opacity: 0; }
+  }
+
+  /* ---------- Letter (fades in on the same spot as the envelope) ---------- */
+  .letter-card{
+    background: var(--paper);
+    max-width: 640px;
+    width: 100%;
+    border-radius: 18px;
+    padding: clamp(1.6rem, 5vw, 3.2rem);
+    box-shadow: 0 20px 50px rgba(156,63,78,0.18);
+    position: relative;
+    display: none;
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+    border: 1px solid #F2DED3;
+  }
+  .letter-card.showing{
+    display: block;
+  }
+  .letter-card.reveal{
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .letter-card::before{
+    content: "";
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    border-radius: 18px;
+    background:
+      linear-gradient(var(--paper), var(--paper)),
+      repeating-linear-gradient(transparent, transparent 34px, #F1E2DA 35px);
+    background-clip: content-box, padding-box;
+    z-index: -1;
+    opacity: 0.5;
+  }
+
+  .to-line{
+    font-family: 'Aref Ruqaa', serif;
+    font-size: 1.5rem;
+    color: var(--rose-deep);
+    margin-bottom: 1.6rem;
+  }
+
+  .letter-body p{
+    font-size: 1.08rem;
+    line-height: 2.1;
+    color: var(--plum);
+    margin-bottom: 1.3rem;
+  }
+
+  .letter-body strong{
+    color: var(--rose-deep);
+  }
+
+  .signature{
+    font-family: 'Aref Ruqaa', serif;
+    font-size: 1.6rem;
+    color: var(--rose);
+    text-align: left;
+    margin-top: 2rem;
+  }
+
+  /* ---------- Kaffara stamp ---------- */
+  .stamp-wrap{
+    display: flex;
+    justify-content: center;
+    margin: -1rem 0 3.5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .stamp{
+    background: var(--paper);
+    border: 2px dashed var(--sage);
+    border-radius: 14px;
+    padding: 1.4rem 2rem;
+    max-width: 460px;
+    text-align: center;
+    transform: rotate(-3deg);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    opacity: 0;
+    transition: opacity 0.9s ease 0.2s, transform 0.9s ease 0.2s;
+  }
+  .stamp.reveal{
+    opacity: 1;
+    transform: rotate(-3deg) translateY(0);
+  }
+
+  .stamp .stamp-title{
+    font-family: 'Aref Ruqaa', serif;
+    color: var(--sage);
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
+  }
+  .stamp .stamp-sub{
+    font-size: 0.92rem;
+    color: var(--plum);
+    opacity: 0.85;
+  }
+
+  /* ---------- Promise / Closing ---------- */
+  .closing{
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 1rem 1.5rem 7rem;
+  }
+
+  .closing h2{
+    font-family: 'Aref Ruqaa', serif;
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
+    margin-bottom: 1rem;
+    color: var(--plum);
+  }
+
+  .closing p{
+    max-width: 420px;
+    margin: 0 auto 2.2rem;
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--rose-deep);
+  }
+
+  .forgive-btn{
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #fff;
+    background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+    border: none;
+    padding: 0.95rem 2.6rem;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 12px 24px rgba(156,63,78,0.35);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+    overflow: visible;
+  }
+  .forgive-btn:hover{
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 16px 30px rgba(156,63,78,0.45);
+  }
+  .forgive-btn:active{ transform: translateY(0) scale(0.98); }
+
+  .thank-you{
+    margin-top: 1.8rem;
+    font-family: 'Aref Ruqaa', serif;
+    font-size: 1.4rem;
+    color: var(--sage);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .thank-you.show{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .burst{
+    position: fixed;
+    z-index: 50;
+    pointer-events: none;
+    font-size: 1.2rem;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="petal-field" id="petalField"></div>
+
+<section class="hero" id="hero">
+  <div class="hero-eyebrow">لسيدرا</div>
+  <h1>انا آسف بجد يا سيدرا</h1>
+  <p class="sub">ممكن تفتحي الرسالة</p>
+
+  <div class="stage">
+    <div class="envelope-wrap" id="envelopeWrap">
+      <div class="envelope" id="envelope">
+        <div class="env-body"></div>
+        <div class="letter-peek"></div>
+        <div class="env-flap"></div>
+        <div class="seal">س</div>
+      </div>
+    </div>
+
+    <div class="letter-card" id="letterCard">
+      <div class="to-line">لأغلى سيدرا</div>
+      <div class="letter-body">
+        <p>انا عارف كويس اللي عملته كان غلط</p>
+        <p>بس والله كانت غير مقصودة و مكنتش اقصد خالص كنت بس بقول الجملة بمبالغة فطلعت بذلة لسان</p>
+        <p>و انا اكيد عارف اللي عملته دا غلط و والله ندمان و انا اصلا منمتش طول اللي و من اول ما الشمس طلعت نزلت و عملت الكفارة علي الحلفان دا</p>
+        <p>و انا بجد بوعدك ان مستحيل اعمل حاجة زي دي ابدا تاني و دا وعد، أنا فعلاً مقدرش أبطل أكلمك، ودي مش جملة بتتقال كده للمجاملة، دي حقيقة.</p>
+      </div>
+      <div class="signature">سامحيني 🤍</div>
+    </div>
+  </div>
+
+  <div class="hint" id="hint">  اضغطي على الظرف عشان تفتحيه و انزل تحت 💌</div>
+  <div class="scroll-cue" id="scrollCue" title="انزلي تحت"></div>
+</section>
+
+<div class="stamp-wrap">
+  <div class="stamp" id="stamp">
+    <div class="stamp-title">✓ اتعملت الكفارة</div>
+    <div class="stamp-sub">النهاردة، بقلب صادق مش بس بكلام</div>
+  </div>
+</div>
+
+<section class="closing">
+  <h2>تسامحيني يا سيدرا؟</h2>
+  <button class="forgive-btn" id="forgiveBtn">سامحتك 🤍</button>
+  <div class="thank-you" id="thankYou">شكرا جدا عشان قدرتي، والله ما هتندمي</div>
+</section>
+
+<script>
+  // Floating petals
+  const petalField = document.getElementById('petalField');
+  const petalColors = ['#E9A0A8', '#F0C7C0', '#D98C99', '#F3D9CE'];
+  const petalCount = window.innerWidth < 600 ? 10 : 18;
+
+  function makePetal(){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    const size = 10 + Math.random() * 14;
+    const left = Math.random() * 100;
+    const duration = 9 + Math.random() * 10;
+    const delay = Math.random() * -20;
+    const color = petalColors[Math.floor(Math.random()*petalColors.length)];
+    p.style.left = left + 'vw';
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.animationDuration = duration + 's';
+    p.style.animationDelay = delay + 's';
+    p.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 2C9 6 6 9 6 13a6 6 0 0 0 12 0c0-4-3-7-6-11z" fill="${color}"/></svg>`;
+    petalField.appendChild(p);
+  }
+  for(let i=0;i<petalCount;i++) makePetal();
+
+  // Envelope open interaction -> letter appears in the same spot
+  const hero = document.getElementById('hero');
+  const envelope = document.getElementById('envelope');
+  const envelopeWrap = document.getElementById('envelopeWrap');
+  const letterCard = document.getElementById('letterCard');
+  const hint = document.getElementById('hint');
+  const scrollCue = document.getElementById('scrollCue');
+  let opened = false;
+
+  envelopeWrap.addEventListener('click', () => {
+    if(opened) return;
+    opened = true;
+
+    hero.classList.add('opened');
+    envelope.classList.add('open');
+    hint.style.opacity = '0';
+
+    // let the envelope-opening animation play, then swap it out for the letter
+    setTimeout(() => {
+      envelopeWrap.classList.add('hide');
+    }, 550);
+
+    setTimeout(() => {
+      envelopeWrap.classList.add('gone');
+      letterCard.classList.add('showing');
+      // force reflow so the transition runs
+      void letterCard.offsetWidth;
+      letterCard.classList.add('reveal');
+    }, 1050);
+
+    setTimeout(() => {
+      scrollCue.classList.add('show');
+    }, 1900);
+  });
+
+  scrollCue.addEventListener('click', () => {
+    document.querySelector('.stamp-wrap').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // Reveal stamp on scroll
+  const stamp = document.getElementById('stamp');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('reveal');
+      }
+    });
+  }, { threshold: 0.2 });
+
+  observer.observe(stamp);
+
+  // Forgive button
+  const forgiveBtn = document.getElementById('forgiveBtn');
+  const thankYou = document.getElementById('thankYou');
+  let forgiven = false;
+
+  const burstShapes = ['🤍','🌸','✨'];
+
+  function burstAt(x, y){
+    for(let i=0;i<14;i++){
+      const el = document.createElement('div');
+      el.className = 'burst';
+      el.textContent = burstShapes[Math.floor(Math.random()*burstShapes.length)];
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 60 + Math.random() * 100;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      document.body.appendChild(el);
+      el.animate([
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${dx}px, ${dy}px) scale(0.4)`, opacity: 0 }
+      ], { duration: 900 + Math.random()*400, easing: 'cubic-bezier(.2,.8,.3,1)' });
+      setTimeout(() => el.remove(), 1400);
+    }
+  }
+
+  forgiveBtn.addEventListener('click', (e) => {
+    const rect = forgiveBtn.getBoundingClientRect();
+    burstAt(rect.left + rect.width/2, rect.top + rect.height/2);
+    if(!forgiven){
+      forgiven = true;
+      thankYou.classList.add('show');
+      forgiveBtn.textContent = 'سامحتك تاني 🤍';
+    }
+  });
+</script>
+
+</body>
+</html>
