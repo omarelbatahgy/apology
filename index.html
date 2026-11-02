@@ -62,7 +62,9 @@ button.b{font-family:'Cairo',sans-serif;font-size:18px;font-weight:600;border:0;
 body{font-family:'Nunito',sans-serif}
 button.b{font-family:'Nunito',sans-serif}
 #intro h1,h2,.letter .sig{font-family:'Dancing Script',cursive}
-.letter p{line-height:1.8}
+.letter p{line-height:1.8;font-size:clamp(16px,3.8vw,19px)}
+.letter h3{font-family:'Dancing Script',cursive;font-size:clamp(30px,8vw,42px);color:var(--wine);margin:0 0 18px;min-height:1.3em}
+.letter{padding:42px 28px 34px}
 </style>
 </head>
 <body>
@@ -85,7 +87,7 @@ button.b{font-family:'Nunito',sans-serif}
 
 <section>
   <div class="letter rv">
-    <p id="t1"></p><p id="t2"></p><p id="t3"></p>
+    <h3 id="ttl"></h3><div id="body"></div>
     <div class="sig" id="sig"></div>
   </div>
 </section>
@@ -94,9 +96,9 @@ button.b{font-family:'Nunito',sans-serif}
   <h2 class="rv" style="font-size:clamp(28px,7vw,48px)">Things I’ll never forget</h2>
   <div class="reasons rv">
     <div class="pet"><span>Your smile that lights up my day</span></div>
-    <div class="pet"><span>Always being by my side</span></div>
+    <div class="pet"><span>Your funny humor</span></div>
     <div class="pet"><span>Your kind heart</span></div>
-    <div class="pet"><span>How well you get me</span></div>
+    <div class="pet"><span>How happy you get me</span></div>
   </div>
 </section>
 
@@ -116,13 +118,20 @@ button.b{font-family:'Nunito',sans-serif}
 
 <script>
 // ✏️ عدّل الاسم والرسالة من هنا
-const HER_NAME = "My dearest";
+const TITLE = "To My Queen ❤️";
 const MSG = [
-  "I know I upset you, and nothing hurts my heart more than seeing you sad because of me.",
-  "I was wrong, and I know words alone aren’t enough, but I truly am sorry from the bottom of my heart. Having you in my life matters more to me than any fight or stubbornness.",
-  "Come back to me, because the world is dull without your smile, and I miss seeing the red you love shine again."
+  "My beautiful girl,",
+  "I’ve been thinking about what happened, and I want you to know that I’m truly sorry for upsetting you.",
+  "When we were joking about the money and the hotel, I honestly thought we were just laughing together. I didn’t realize my words might hurt you or make you feel uncomfortable. I never wanted you to feel like I was holding the money over your head, questioning your intentions, or putting a price on spending time with you.",
+  "I helped you because I care about you and wanted to be there for you when you needed support. And when I talked about coming to see you, it was because I wanted to spend time with you, be close to you, and make beautiful memories together—not because I expected anything from you.",
+  "I understand that even when something is meant as a joke, it can still hurt. I’m sorry I didn’t recognize that in the moment, and I’m sorry my words made you feel anything less than loved and respected.",
+  "You mean so much more to me than a misunderstanding or a silly joke. I never want you to feel that my care for you comes with conditions or expectations.",
+  "I respect how you feel and your decision about me coming. I don’t want to pressure you. I just wanted to explain what was in my heart and remind you that my intentions were always genuine.",
+  "I’m sorry, my Queen. You deserve tenderness, understanding, and respect from me—and I want to do better at giving you that.",
+  "I care about you, and I never wanted to hurt you. ❤️"
 ];
-const SIG = "— Yours, always ❤️";
+const SIG = "Yours, your favorite idiot";
+MSG.forEach(t => { const p = document.createElement('p'); p.className = 'rv'; p.textContent = t; document.getElementById('body').appendChild(p); });
 
 const heart = '❤';
 const fx = document.getElementById('fx');
@@ -158,12 +167,10 @@ let typed = false;
 const letterObs = new IntersectionObserver(async es => {
   if (es[0].isIntersecting && !typed) {
     typed = true;
-    await type(document.getElementById('t1'), HER_NAME + ", " + MSG[0]);
-    await type(document.getElementById('t2'), MSG[1]);
-    await type(document.getElementById('t3'), MSG[2]);
+    await type(document.getElementById('ttl'), TITLE, 70);
     await type(document.getElementById('sig'), SIG, 60);
   }
-}, { threshold: .5 });
+}, { threshold: .15 });
 letterObs.observe(document.querySelector('.letter'));
 
 function burst(x, y, n = 28) {
